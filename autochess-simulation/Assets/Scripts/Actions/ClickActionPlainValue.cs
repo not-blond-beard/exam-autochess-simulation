@@ -1,12 +1,13 @@
 using Libplanet.Store;
+using System.Collections.Immutable;
 
 namespace Scripts.Actions
 {
     public class ClickActionPlainValue : DataModel
     {
-        public long Count { get; private set; }
+        public ImmutableList<int> Count { get; private set; }
 
-        public ClickActionPlainValue(long count)
+        public ClickActionPlainValue(ImmutableList<int> count)
             : base()
         {
             Count = count;

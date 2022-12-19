@@ -1,13 +1,15 @@
 using System.Collections.Generic;
+using System.Linq;
 using Libplanet.Action;
-using Libplanet.Blocks;
 using Libplanet.Blockchain.Renderers;
+using Libplanet.Blocks;
 using Libplanet.Unity;
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.Events;
 using Scripts.Actions;
 using Scripts.States;
+using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.UI;
+using Serilog.Events;
 
 namespace Scripts
 {
@@ -42,6 +44,7 @@ namespace Scripts
             // General application settings.
             Screen.SetResolution(800, 600, FullScreenMode.Windowed);
             Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.ScriptOnly);
+            SerilogController.WriteSerilog("debug.txt", LogEventLevel.Verbose, "test");
 
             // Register listeners.
             _blockUpdatedEvent = new BlockUpdatedEvent();
@@ -104,7 +107,7 @@ namespace Scripts
             }
             else
             {
-                _totalCountUpdatedEvent.Invoke(new CountState(0L));
+                _totalCountUpdatedEvent.Invoke(CountState.InitState());
             }
 
             _timer.ResetTimer();
@@ -127,7 +130,7 @@ namespace Scripts
                     List<PolymorphicAction<ActionBase>> actions =
                         new List<PolymorphicAction<ActionBase>>()
                         {
-                            new ClickAction(Click.Count)
+                            new ClickAction()
                         };
                     _agent.MakeTransaction(actions);
                 }
@@ -150,7 +153,7 @@ namespace Scripts
         // Update total count text.
         private void UpdateTotalCountText(CountState countState)
         {
-            TotalCountText.text = $"Total Count: {countState.Count}";
+            TotalCountText.text = $"Total Count: {countState.Count.ToList()[0]}";
         }
     }
 }
