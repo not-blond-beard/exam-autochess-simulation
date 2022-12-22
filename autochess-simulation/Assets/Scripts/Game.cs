@@ -10,6 +10,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using Serilog.Events;
+using System.Collections.Immutable;
 
 namespace Scripts
 {
@@ -130,7 +131,7 @@ namespace Scripts
                     List<PolymorphicAction<ActionBase>> actions =
                         new List<PolymorphicAction<ActionBase>>()
                         {
-                            new ClickAction()
+                            new ClickAction(ImmutableList<int>.Empty.Add(3).Add(3))
                         };
                     _agent.MakeTransaction(actions);
                 }
