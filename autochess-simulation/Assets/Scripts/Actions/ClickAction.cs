@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Immutable;
 using Libplanet.Action;
 using Libplanet.Unity;
 using Scripts.States;
@@ -18,7 +19,7 @@ namespace Scripts.Actions
         }
 
         // Used for creating a new action.
-        public ClickAction(long count)
+        public ClickAction(ImmutableList<int> count)
         {
             _plainValue = new ClickActionPlainValue(count);
         }
@@ -47,16 +48,15 @@ namespace Scripts.Actions
         {
             // Retrieves the previously stored state.
             IAccountStateDelta states = context.PreviousStates;
+
+            var empty = ImmutableList<int>.Empty.Add(7).Add(7).Add(7).Add(7);
+
             CountState countState =
                 states.GetState(context.Signer) is Bencodex.Types.Dictionary countStateEncoded
                     ? new CountState(countStateEncoded)
-                    : new CountState(0L);
+                    : new CountState(empty);
 
-            // Mutates the loaded state, logs the result, and stores the resulting state.
-            long prevCount = countState.Count;
-            countState = countState.AddCount(_plainValue.Count);
-            long nextCount = countState.Count;
-            Debug.Log($"click_action: PrevCount: {prevCount}, NextCount: {nextCount}");
+            Debug.LogError($"click_action: PrevCount: {countState.Count}");
             return states.SetState(context.Signer, countState.Encode());
         }
     }

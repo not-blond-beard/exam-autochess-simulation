@@ -1,13 +1,20 @@
+using System.Collections.Immutable;
 using Libplanet.Store;
 
 namespace Scripts.States
 {
     public class CountState : DataModel
     {
-        public long Count { get; private set; }
+        public ImmutableList<int> Count { get; private set; }
 
         // Used for creating a new state.
-        public CountState(long count)
+        public CountState()
+            : base()
+        {
+            Count = ImmutableList<int>.Empty;
+        }
+
+        public CountState(ImmutableList<int> count)
             : base()
         {
             Count = count;
@@ -21,9 +28,10 @@ namespace Scripts.States
         }
 
         // Used for adding `count` to the current state.
-        public CountState AddCount(long count)
+        public static CountState InitState()
         {
-            return new CountState(Count + count);
+            var empty = ImmutableList<int>.Empty.Add(0).Add(0).Add(0);
+            return new CountState(empty);
         }
     }
 }
