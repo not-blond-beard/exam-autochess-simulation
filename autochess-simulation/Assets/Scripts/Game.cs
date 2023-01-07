@@ -1,16 +1,14 @@
 using System.Collections.Generic;
-using System.Linq;
 using Libplanet.Action;
 using Libplanet.Blockchain.Renderers;
 using Libplanet.Blocks;
 using Libplanet.Unity;
 using Scripts.Actions;
 using Scripts.States;
+using Serilog.Events;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using Serilog.Events;
-using System.Collections.Immutable;
 
 namespace Scripts
 {
@@ -19,7 +17,7 @@ namespace Scripts
     {
     }
 
-    public class TotalCountUpdatedEvent : UnityEvent<CountState>
+    public class RoundUpdatedEvent : UnityEvent<SessionState>
     {
     }
 
@@ -29,15 +27,13 @@ namespace Scripts
         public Text BlockHashText;
         public Text BlockIndexText;
         public Text AddressText;
-        public Text TotalCountText;
-        public Text TimerText;
-        public Click Click;
+
+        public Text RoundText;
 
         private BlockUpdatedEvent _blockUpdatedEvent;
-        private TotalCountUpdatedEvent _totalCountUpdatedEvent;
+        private RoundUpdatedEvent _roundUpdatedEvent;
         private IEnumerable<IRenderer<PolymorphicAction<ActionBase>>> _renderers;
         private Agent _agent;
-        private Timer _timer;
 
         // Unity MonoBehaviour Awake().
         public void Awake()
@@ -50,8 +46,8 @@ namespace Scripts
             // Register listeners.
             _blockUpdatedEvent = new BlockUpdatedEvent();
             _blockUpdatedEvent.AddListener(UpdateBlockTexts);
-            _totalCountUpdatedEvent = new TotalCountUpdatedEvent();
-            _totalCountUpdatedEvent.AddListener(UpdateTotalCountText);
+            _roundUpdatedEvent = new RoundUpdatedEvent();
+            _roundUpdatedEvent.AddListener(UpdateRoundText);
 
             // Renderers are called when certain conditions are met.
             // There are different types of renderers called under different conditions.
@@ -79,7 +75,7 @@ namespace Scripts
                         // Invoke the event handler only if the state is updated.
                         if (nextStates.GetState(context.Signer) is Bencodex.Types.Dictionary bdict)
                         {
-                            _agent.RunOnMainThread(() => _totalCountUpdatedEvent.Invoke(new CountState(bdict)));
+                            _agent.RunOnMainThread(() => _roundUpdatedEvent.Invoke(new SessionState(bdict)));
                         }
                     }
                 }
@@ -87,9 +83,6 @@ namespace Scripts
 
             // Initialize a Libplanet Unity Agent.
             _agent = Agent.AddComponentTo(gameObject, _renderers);
-
-            // Initialize a Timer.
-            _timer = new Timer();
         }
 
         // Unity MonoBehaviour Start().
@@ -104,44 +97,22 @@ namespace Scripts
             Debug.Log($"init state is null: {initialState is null}");
             if (initialState is Bencodex.Types.Dictionary bdict)
             {
-                _totalCountUpdatedEvent.Invoke(new CountState(bdict));
+                _roundUpdatedEvent.Invoke(new SessionState(bdict));
             }
             else
             {
-                _totalCountUpdatedEvent.Invoke(CountState.InitState());
+                _roundUpdatedEvent.Invoke(new SessionState(-1));
             }
-
-            _timer.ResetTimer();
-            TimerText.text = $"Timer: {_timer.Clock:F1}";
         }
 
-        // Unity MonoBehaviour FixedUpdate().
-        public void FixedUpdate()
+        public void CreateSession()
         {
-            _timer.Tick();
-
-            // If timer clock reaches zero, count the number of clicks so far
-            // and create a transaction containing an action with the click count.
-            // Afterwards, reset the timer and the count.
-            if (_timer.Clock <= 0)
-            {
-                if (Click.Count > 0)
+            List<PolymorphicAction<ActionBase>> actions =
+                new List<PolymorphicAction<ActionBase>>()
                 {
-                    // ActionBase to PolymorphicAction Casting is done automagically.
-                    List<PolymorphicAction<ActionBase>> actions =
-                        new List<PolymorphicAction<ActionBase>>()
-                        {
-                            new ClickAction(ImmutableList<int>.Empty.Add(3).Add(3))
-                        };
-                    _agent.MakeTransaction(actions);
-                }
-
-                Click.ResetCount();
-                _timer.ResetTimer();
-            }
-
-            // Update timer text.
-            TimerText.text = $"Timer: {_timer.Clock:F1}";
+                    new CreateSessionAction()
+                };
+            _agent.MakeTransaction(actions);
         }
 
         // Update block texts.
@@ -152,9 +123,9 @@ namespace Scripts
         }
 
         // Update total count text.
-        private void UpdateTotalCountText(CountState countState)
+        private void UpdateRoundText(SessionState state)
         {
-            TotalCountText.text = $"Total Count: {countState.Count.ToList()[0]}";
+            RoundText.text = $"Current Round: {state.Round}";
         }
     }
 }
