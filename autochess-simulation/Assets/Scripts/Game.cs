@@ -101,7 +101,7 @@ namespace Scripts
             }
             else
             {
-                _roundUpdatedEvent.Invoke(new SessionState(-1));
+                _roundUpdatedEvent.Invoke(new SessionState(-1L));
             }
         }
 
@@ -110,7 +110,7 @@ namespace Scripts
             List<PolymorphicAction<ActionBase>> actions =
                 new List<PolymorphicAction<ActionBase>>()
                 {
-                    new CreateSessionAction()
+                    new CreateSessionAction("test")
                 };
             _agent.MakeTransaction(actions);
         }
@@ -125,7 +125,7 @@ namespace Scripts
         // Update total count text.
         private void UpdateRoundText(SessionState state)
         {
-            RoundText.text = $"Current Round: {state.Round}";
+            RoundText.text = $"Current Round: {state.Round} and StartedBlockIndex: {state.StartedBlockIndex}";
         }
     }
 }
