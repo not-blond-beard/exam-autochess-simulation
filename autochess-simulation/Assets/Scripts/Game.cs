@@ -110,7 +110,7 @@ namespace Scripts
             List<PolymorphicAction<ActionBase>> actions =
                 new List<PolymorphicAction<ActionBase>>()
                 {
-                    new CreateSessionAction("test")
+                    new CreateSessionAction()
                 };
             _agent.MakeTransaction(actions);
         }

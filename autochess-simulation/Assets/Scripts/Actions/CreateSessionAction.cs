@@ -1,5 +1,6 @@
 using System;
 using Libplanet.Action;
+using Libplanet.Store;
 using Libplanet.Unity;
 using Scripts.States;
 using UnityEngine;
@@ -9,16 +10,27 @@ namespace Scripts.Actions
     [ActionType("create_session")]
     public class CreateSessionAction : ActionBase
     {
-        private CreateSessionActionPlainValue _plainValue;
+
+        class ActionPlainValue : DataModel
+        {
+
+            public ActionPlainValue()
+                : base()
+            {
+            }
+
+
+            public ActionPlainValue(Bencodex.Types.Dictionary encoded)
+                : base(encoded)
+            {
+            }
+        }
+
+        private ActionPlainValue _plainValue;
 
         public CreateSessionAction()
         {
-        }
-
-        // Used for creating a new action.
-        public CreateSessionAction(string test)
-        {
-            _plainValue = new CreateSessionActionPlainValue(test);
+            _plainValue = new ActionPlainValue();
         }
 
         public override Bencodex.Types.IValue PlainValue => _plainValue.Encode();
@@ -27,7 +39,7 @@ namespace Scripts.Actions
         {
             if (plainValue is Bencodex.Types.Dictionary bdict)
             {
-                _plainValue = new CreateSessionActionPlainValue(bdict);
+                _plainValue = new ActionPlainValue(bdict);
             }
             else
             {
