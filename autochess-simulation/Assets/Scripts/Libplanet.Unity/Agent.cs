@@ -1,4 +1,3 @@
-#nullable disable
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using Bencodex.Types;
@@ -13,6 +12,7 @@ using Libplanet.Store;
 using Libplanet.Tx;
 using NetMQ;
 using UnityEngine;
+using Libplanet.Blockchain.Policies;
 
 namespace Libplanet.Unity
 {
@@ -63,7 +63,9 @@ namespace Libplanet.Unity
         /// <returns>A new <see cref="Agent"/> instance.</returns>
         public static Agent AddComponentTo(
             GameObject gameObject,
-            IEnumerable<IRenderer<PolymorphicAction<ActionBase>>> renderers
+            IEnumerable<IRenderer<PolymorphicAction<ActionBase>>> renderers,
+            IBlockPolicy<PolymorphicAction<ActionBase>> blockPolicy = null,
+            IStagePolicy<PolymorphicAction<ActionBase>> stagePolicy = null
         )
         {
             Agent self = gameObject.AddComponent<Agent>();
@@ -71,7 +73,7 @@ namespace Libplanet.Unity
             self.PrivateKey = privateKey;
             self.Address = privateKey.ToAddress();
 
-            self.ConfigureNode(renderers);
+            self.ConfigureNode(renderers, blockPolicy, stagePolicy);
             self._miner = new Miner(self._swarm, self.PrivateKey);
             self._actionWorker = new ActionWorker(self._swarm, self.PrivateKey);
             return self;
@@ -157,7 +159,9 @@ namespace Libplanet.Unity
         }
 
         private void ConfigureNode(
-            IEnumerable<IRenderer<PolymorphicAction<ActionBase>>> renderers)
+            IEnumerable<IRenderer<PolymorphicAction<ActionBase>>> renderers,
+            IBlockPolicy<PolymorphicAction<ActionBase>> blockPolicy = null,
+            IStagePolicy<PolymorphicAction<ActionBase>> stagePolicy = null)
         {
             SwarmConfig swarmConfig = Utils.LoadSwarmConfig(Paths.SwarmConfigPath);
             Block<PolymorphicAction<ActionBase>> genesis = Utils.LoadGenesisBlock(
@@ -167,8 +171,8 @@ namespace Libplanet.Unity
             var nodeConfig = new NodeConfig<PolymorphicAction<ActionBase>>(
                 PrivateKey,
                 new NetworkConfig<PolymorphicAction<ActionBase>>(
-                    NodeUtils<PolymorphicAction<ActionBase>>.DefaultBlockPolicy,
-                    NodeUtils<PolymorphicAction<ActionBase>>.DefaultStagePolicy,
+                    blockPolicy is null? blockPolicy : NodeUtils<PolymorphicAction<ActionBase>>.DefaultBlockPolicy,
+                    stagePolicy is null? stagePolicy : NodeUtils<PolymorphicAction<ActionBase>>.DefaultStagePolicy,
                     genesis),
                 swarmConfig,
                 store,

@@ -6,9 +6,9 @@ using Libplanet.Unity;
 
 namespace Scripts.Policy
 {
-    public class BlockPolicy : BlockPolicy<PolymorphicAction<ActionBase>>
+    public class ASBlockPolicy : BlockPolicy<PolymorphicAction<ActionBase>>
     {
-        public BlockPolicy()
+        public ASBlockPolicy()
         {
 
         }

@@ -9,6 +9,9 @@ using Serilog.Events;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using Libplanet.Blockchain.Policies;
+using Scripts.Policy;
+
 
 namespace Scripts
 {
@@ -68,7 +71,9 @@ namespace Scripts
                 }
             };
 
-            _agent = Agent.AddComponentTo(gameObject, _renderers);
+            var blockPolicy = new ASBlockPolicy();
+            var stagePolicy = new VolatileStagePolicy<PolymorphicAction<ActionBase>>();
+            _agent = Agent.AddComponentTo(gameObject, _renderers, blockPolicy, stagePolicy);
         }
 
         public void Start()
