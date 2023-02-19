@@ -71,7 +71,7 @@ namespace Scripts
                 }
             };
 
-            var blockPolicy = new ASBlockPolicy();
+            var blockPolicy = new BlockPolicySource().GetPolicy();
             var stagePolicy = new VolatileStagePolicy<PolymorphicAction<ActionBase>>();
             _agent = Agent.AddComponentTo(gameObject, _renderers, blockPolicy, stagePolicy);
         }

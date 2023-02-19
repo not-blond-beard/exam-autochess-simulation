@@ -171,8 +171,8 @@ namespace Libplanet.Unity
             var nodeConfig = new NodeConfig<PolymorphicAction<ActionBase>>(
                 PrivateKey,
                 new NetworkConfig<PolymorphicAction<ActionBase>>(
-                    blockPolicy is null? blockPolicy : NodeUtils<PolymorphicAction<ActionBase>>.DefaultBlockPolicy,
-                    stagePolicy is null? stagePolicy : NodeUtils<PolymorphicAction<ActionBase>>.DefaultStagePolicy,
+                    blockPolicy is null? NodeUtils<PolymorphicAction<ActionBase>>.DefaultBlockPolicy : blockPolicy,
+                    stagePolicy is null? NodeUtils<PolymorphicAction<ActionBase>>.DefaultStagePolicy : stagePolicy,
                     genesis),
                 swarmConfig,
                 store,
