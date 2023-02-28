@@ -4,7 +4,7 @@ using Libplanet.Blockchain.Renderers;
 using Libplanet.Blocks;
 using Libplanet.Unity;
 using Scripts.Actions;
-using Scripts.States;
+using Scripts.States.Session;
 using Serilog.Events;
 using UnityEngine;
 using UnityEngine.Events;

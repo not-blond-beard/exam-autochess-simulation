@@ -2,7 +2,7 @@ using System;
 using Libplanet.Action;
 using Libplanet.Store;
 using Libplanet.Unity;
-using Scripts.States;
+using Scripts.States.Session;
 using UnityEngine;
 
 namespace Scripts.Actions
@@ -52,13 +52,26 @@ namespace Scripts.Actions
         {
             IAccountStateDelta states = ctx.PreviousStates;
 
-            SessionState sessionState =
-                states.GetState(ctx.Signer) is Bencodex.Types.Dictionary sessionStateEncoded
-                    ? new SessionState(sessionStateEncoded)
-                    : new SessionState(ctx.BlockIndex);
+            AllSessionState allSessionState =
+                states.GetState(AllSessionState.Address) is Bencodex.Types.Dictionary allSessionStateEncoded
+                    ? new AllSessionState(allSessionStateEncoded)
+                    : new AllSessionState();
 
-            Debug.LogError($"create session: Started Block Index: {sessionState.StartedBlockIndex}");
-            return states.SetState(ctx.Signer, sessionState.Encode());
+            Debug.LogError($"All session: Count: {allSessionState.Sessions.Count}");
+
+            // 모든 세션을 Get 하는 코드는 엄청난 부하를 주지만 당장은 전부 가져옵니다.
+            foreach (var address in allSessionState.Sessions)
+            {
+                SessionState sessionState =
+                    states.GetState(address) is Bencodex.Types.Dictionary sessionStateEncoded
+                        ? new SessionState(sessionStateEncoded)
+                        : throw new Exception($"[temp] session not found, {address}");
+
+                sessionState.Next();
+                states.SetState(ctx.Signer, sessionState.Encode());
+            }
+
+            return states.SetState(ctx.Signer, allSessionState.Encode());
         }
     }
 }

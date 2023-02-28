@@ -2,7 +2,7 @@ using System;
 using Libplanet.Action;
 using Libplanet.Store;
 using Libplanet.Unity;
-using Scripts.States;
+using Scripts.States.Session;
 using UnityEngine;
 
 namespace Scripts.Actions
@@ -58,7 +58,15 @@ namespace Scripts.Actions
                     : new SessionState(ctx.BlockIndex);
 
             Debug.LogError($"create session: Started Block Index: {sessionState.StartedBlockIndex}");
-            return states.SetState(ctx.Signer, sessionState.Encode());
+
+            AllSessionState allSessionState =
+                states.GetState(AllSessionState.Address) is Bencodex.Types.Dictionary allSessionStateEncoded
+                    ? new AllSessionState(allSessionStateEncoded)
+                    : new AllSessionState();
+
+            return states
+                .SetState(ctx.Signer, sessionState.Encode())
+                .SetState(AllSessionState.Address, allSessionState.AddSession(ctx.Signer).Encode());
         }
     }
 }

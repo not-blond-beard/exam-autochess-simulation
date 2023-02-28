@@ -2,7 +2,7 @@ using System.Collections.Immutable;
 using Libplanet;
 using Libplanet.Store;
 
-namespace Scripts.States
+namespace Scripts.States.Session
 {
     public class SessionState : DataModel
     {
