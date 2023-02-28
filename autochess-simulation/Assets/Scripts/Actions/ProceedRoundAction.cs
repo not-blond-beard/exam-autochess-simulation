@@ -68,10 +68,11 @@ namespace Scripts.Actions
                         : throw new Exception($"[temp] session not found, {address}");
 
                 sessionState.Next();
-                states.SetState(ctx.Signer, sessionState.Encode());
+                Debug.LogError($"Next Round, Address: {address}");
+                states = states.SetState(ctx.Signer, sessionState.Encode());
             }
 
-            return states.SetState(ctx.Signer, allSessionState.Encode());
+            return states;
         }
     }
 }

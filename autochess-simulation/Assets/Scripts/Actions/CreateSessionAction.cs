@@ -64,9 +64,13 @@ namespace Scripts.Actions
                     ? new AllSessionState(allSessionStateEncoded)
                     : new AllSessionState();
 
+            if (!allSessionState.Sessions.Contains(ctx.Signer))
+            {
+                states = states.SetState(AllSessionState.Address, allSessionState.AddSession(ctx.Signer).Encode());
+            }
+
             return states
-                .SetState(ctx.Signer, sessionState.Encode())
-                .SetState(AllSessionState.Address, allSessionState.AddSession(ctx.Signer).Encode());
+                .SetState(ctx.Signer, sessionState.Encode());
         }
     }
 }
