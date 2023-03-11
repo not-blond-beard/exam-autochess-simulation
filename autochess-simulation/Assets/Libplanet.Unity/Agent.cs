@@ -109,9 +109,9 @@ namespace Libplanet.Unity
         /// Just use <see cref="ActionWorker"/> MakeTransaction.
         /// </summary>
         /// <param name="actions">The list of <see cref="PolymorphicAction{ActionBase}"/>.</param>
-        public void MakeTransaction(IEnumerable<PolymorphicAction<ActionBase>> actions)
+        public void MakeTransaction(IEnumerable<PolymorphicAction<ActionBase>> actions, PrivateKey privateKey = null)
         {
-            _actionWorker.MakeTransaction(actions);
+            _actionWorker.MakeTransaction(actions, privateKey is null ? PrivateKey : privateKey);
         }
 
         /// <summary>

@@ -48,14 +48,14 @@ namespace Libplanet.Unity
         /// </summary>
         /// <param name="actions">The list of <see cref="PolymorphicAction{ActionBase}"/>
         /// to include in a newly created <see cref="Transaction{T}"/>.</param>
-        public void MakeTransaction(IEnumerable<PolymorphicAction<ActionBase>> actions)
+        public void MakeTransaction(IEnumerable<PolymorphicAction<ActionBase>> actions, PrivateKey privateKey = null)
         {
             var task = Task.Run(() =>
             {
                 Debug.LogFormat(
                     "Make Transaction with Actions: {0}",
                     string.Join(", ", actions.Select(i => i.InnerAction)));
-                _swarm.BlockChain.MakeTransaction(PrivateKey, actions.ToList());
+                _swarm.BlockChain.MakeTransaction(privateKey is null ? PrivateKey : privateKey, actions.ToList());
             });
 
             try

@@ -36,8 +36,11 @@ namespace Scripts
         private IEnumerable<IRenderer<PolymorphicAction<ActionBase>>> _renderers;
         private Agent _agent;
 
+        private UserManager userManager = new UserManager();
+
         public void Awake()
         {
+            userManager.ReadTempUserFile();
             Screen.SetResolution(800, 600, FullScreenMode.Windowed);
             Application.SetStackTraceLogType(LogType.Log, StackTraceLogType.ScriptOnly);
             SerilogController.WriteSerilog("debug.txt", LogEventLevel.Verbose, "test");

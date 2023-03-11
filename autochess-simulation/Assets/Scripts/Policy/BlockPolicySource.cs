@@ -9,7 +9,7 @@ namespace Scripts.Policy
 {
     public partial class BlockPolicySource
     {
-        public static readonly TimeSpan BlockInterval = TimeSpan.FromSeconds(10);
+        public static readonly TimeSpan BlockInterval = TimeSpan.FromSeconds(15);
 
         public IBlockPolicy<PolymorphicAction<ActionBase>> GetPolicy()
         {
